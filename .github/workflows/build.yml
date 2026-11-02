@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build with Buildozer
-        uses: RICHIH/buildozer-action@v1
+        uses: richih/buildozer-action@v1
         id: buildozer
         with:
           command: buildozer -v android debug
