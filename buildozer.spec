@@ -1,21 +1,22 @@
-[app]
-title = J.A.R.V.I.S. HUD
-package.name = jarvismobile
-package.domain = org.jarvis
-source.dir = .
-source.include_exts = py,png,jpg,kg,atlas
-version = 0.1
-requirements = python3,kivy,certifi,urllib3,requests,plyer
-orientation = portrait
-fullscreen = 0
-android.permissions = INTERNET
-android.api = 33
-android.minapi = 21
-android.sdk = 30
-android.ndk = 25b
-android.archs = arm64-v8a
-android.sdk_path = /usr/local/lib/android/sdk
+      - name: Install Android SDK packages and configure Buildozer
+        shell: bash
+        run: |
+          SDKMANAGER="$(command -v sdkmanager)"
+          SDKMANAGER_REAL="$(readlink -f "$SDKMANAGER")"
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
 
-[buildozer]
-log_level = 2
-warn_on_root = 1
+          if [[ -z "$SDK_ROOT" ]]; then
+            SDK_ROOT="$(dirname "$(dirname "$(dirname "$(dirname "$SDKMANAGER_REAL")")")")"
+          fi
+
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+
+          # Buildozer expects sdkmanager at the legacy tools/bin location.
+          mkdir -p "$SDK_ROOT/tools/bin"
+          ln -sf "$SDKMANAGER_REAL" "$SDK_ROOT/tools/bin/sdkmanager"
+
+          "$SDKMANAGER" --install \
+            "platform-tools" \
+            "platforms;android-33" \
+            "build-tools;33.0.2"
