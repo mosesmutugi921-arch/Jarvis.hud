@@ -19,10 +19,10 @@ source.include_exts = py,png,jpg,kv,atlas,json,txt
 version = 0.1
 
 # (list) Application requirements
-# Comma-separated list of packages or recipes (e.g. requirements = python3,kivy)
+# Add other dependencies here if needed (e.g., requirements = python3,kivy,requests)
 requirements = python3,kivy
 
-# (str) Supported orientations (one of landscape, sensorLandscape, portrait or all)
+# (str) Supported orientations
 orientation = portrait
 
 # (bool) Indicate if the application should be fullscreen or not
@@ -33,23 +33,20 @@ fullscreen = 0
 # Android specific configuration
 #
 
-# (int) Target Android API level matching your GitHub workflow (android-33)
+# (int) Target Android API, matching platforms;android-33 in your workflow
 android.api = 33
 
-# (int) Minimum API level supported (Android 7.0+)
+# (int) Minimum API level supported
 android.minapi = 24
 
-# (str) Android NDK version (leave blank for automatic match with API 33)
-# android.ndk = 25b
+# (str) Pin a stable NDK version to prevent build hangs
+android.ndk = 25b
 
-# (bool) Automatically accept SDK licenses (already configured in workflow)
+# (bool) Automatically accept SDK licenses
 android.accept_sdk_license = True
 
-# (list) Supported Architectures for modern Android devices
-android.archs = arm64-v8a, armeabi-v7a
-
-# (list) Permissions required by the app (add if your app uses internet, storage, etc.)
-# android.permissions = INTERNET
+# (list) Supported Architectures
+android.archs = arm64-v8a
 
 
 #
@@ -58,12 +55,13 @@ android.archs = arm64-v8a, armeabi-v7a
 
 [buildozer]
 
-# (int) Log level (0 = error only, 1 = info, 2 = debug with command output)
+# (int) Log level (2 = debug with command output)
 log_level = 2
 
 # (int) Display warning if buildozer is run as root
 warn_on_root = 1
 
-# (str) Path to build output (matches path: bin/*.apk in your workflow)
+# (str) Path to build output, matching path: bin/*.apk in your workflow
 bin_dir = ./bin
+
 
