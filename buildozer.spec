@@ -1,102 +1,69 @@
-name: Build APK
+[app]
 
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
+# (str) Title of your application
+title = Jarvis
 
-permissions:
-  contents: read
+# (str) Package name
+package.name = jarvis
 
-jobs:
-  build:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 60
+# (str) Package domain (needed for android packaging)
+package.domain = org.example
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+# (str) Source code where the main.py lives
+source.dir = .
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
+# (list) Source files to include (empty includes all)
+source.include_exts = py,png,jpg,kv,atlas,json,txt
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
+# (str) Application version
+version = 0.1
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          accept-android-sdk-licenses: true
-          packages: ""
+# (list) Application requirements
+# Comma-separated list of packages or recipes (e.g. requirements = python3,kivy)
+requirements = python3,kivy
 
-      - name: Install Android SDK packages
-        run: |
-          sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-33" \
-            "build-tools;33.0.2"
+# (str) Supported orientations (one of landscape, sensorLandscape, portrait or all)
+orientation = portrait
 
-      - name: Check Buildozer configuration
-        run: |
-          python - <<'PY'
-          from configparser import ConfigParser
-          from pathlib import Path
+# (bool) Indicate if the application should be fullscreen or not
+fullscreen = 0
 
-          path = Path("buildozer.spec")
-          config = ConfigParser()
 
-          if not path.is_file():
-              raise SystemExit("buildozer.spec is missing")
+#
+# Android specific configuration
+#
 
-          if not config.read(path):
-              raise SystemExit("Could not read buildozer.spec")
+# (int) Target Android API level matching your GitHub workflow (android-33)
+android.api = 33
 
-          if not config.has_section("app"):
-              raise SystemExit(
-                  "buildozer.spec must contain an [app] section. "
-                  "Do not put GitHub Actions YAML in this file."
-              )
+# (int) Minimum API level supported (Android 7.0+)
+android.minapi = 24
 
-          print("buildozer.spec is readable and contains [app].")
-          PY
+# (str) Android NDK version (leave blank for automatic match with API 33)
+# android.ndk = 25b
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            autoconf \
-            build-essential \
-            cmake \
-            git \
-            libffi-dev \
-            libltdl-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libssl-dev \
-            libsqlite3-dev \
-            pkg-config \
-            unzip \
-            zip \
-            zlib1g-dev
+# (bool) Automatically accept SDK licenses (already configured in workflow)
+android.accept_sdk_license = True
 
-      - name: Install Buildozer and Python build dependencies
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install "Cython==0.29.36" buildozer
+# (list) Supported Architectures for modern Android devices
+android.archs = arm64-v8a, armeabi-v7a
 
-      - name: Build debug APK
-        run: buildozer -v android debug
+# (list) Permissions required by the app (add if your app uses internet, storage, etc.)
+# android.permissions = INTERNET
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jarvis-debug-apk
-          path: bin/*.apk
-          if-no-files-found: error
-          retention-days: 14
+
+#
+# Buildozer Global Settings
+#
+
+[buildozer]
+
+# (int) Log level (0 = error only, 1 = info, 2 = debug with command output)
+log_level = 2
+
+# (int) Display warning if buildozer is run as root
+warn_on_root = 1
+
+# (str) Path to build output (matches path: bin/*.apk in your workflow)
+bin_dir = ./bin
+
